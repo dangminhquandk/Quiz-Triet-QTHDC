@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>QTHĐC</title>
+  <style>
+    body {
+      font-family: 'Playfair Display', serif;
+      background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #5d4037;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-style: italic;
+      font-weight: 300;
+      letter-spacing: 2px;
+      margin-bottom: 40px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .question {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(5px);
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 600px;
+      transition: transform 0.3s ease;
+    }
+
+    .question:hover {
+      transform: translateY(-5px);
+    }
+
+    label {
+      display: block;
+      margin: 12px 0;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    label:hover {
+      background: rgba(210, 180, 140, 0.2);
+    }
+
+    button {
+      background: #8e735b;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-family: inherit;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 10px;
+      box-shadow: 0 4px 15px rgba(142, 115, 91, 0.3);
+    }
+
+    button:hover {
+      background: #705a46;
+      letter-spacing: 1px;
+    }
+
+    .correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .wrong { background-color: #f8d7da; text-decoration: line-through; color: #721c24; border: 1px solid #f5c6cb; }
+
+    .highlight-correct {
+        color: #155724;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<h1>
+  QTHĐC<br>
+  <span style="font-size: 0.6em">
+    "Biển học vô biên lấy kiên trì làm bến<br>
+    Mây xanh không lối, lấy chí cả dựng lên."<br>
+              Thầy Hữu Giang
+  </span>
+</h1>
+
+
+<div id="quiz"></div>
+
+<div style="text-align: center;">
+    <button onclick="submitQuiz()">CHECK VAR</button>
+    <button onclick="location.reload()">LÀM NHÁT NỮA</button>
+</div>
+
+<div id="result" style="margin-top: 20px; font-size: 1.2em; font-weight: bold;"></div>
+
+<script src="question_QTHĐC.js"></script>
+
+<script>
+// 1. Thay đổi tên biến tham chiếu từ 'questions' thành 'QUESTIONS' để khớp với file data
+if (typeof window.QUESTIONS === 'undefined') {
+    document.getElementById("quiz").innerHTML = "<p style='color:red; text-align:center'>Lỗi: Không tìm thấy dữ liệu câu hỏi. Hãy chắc chắn file question_QTHĐC.js nằm cùng thư mục.</p>";
+} else {
+
+    // Lấy dữ liệu từ biến QUESTIONS
+    const dataSrc = window.QUESTIONS;
+
+    // Random và lấy 20 câu
+    const selected = dataSrc
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 20);
+
+    const quizForm = document.getElementById("quiz");
+
+    selected.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "question";
+   
+      // 2. Sửa 'q.question' thành 'q.text' vì trong file JS thuộc tính tên là "text"
+      div.innerHTML = `<b>Câu ${i + 1}:</b> ${q.text}`;
+
+      q.options.forEach((opt, idx) => {
+        div.innerHTML += `
+          <label id="q${i}_opt${idx}">
+            <input type="radio" name="q${i}" value="${idx}">
+            ${opt}
+          </label>`;
+      });
+
+      quizForm.appendChild(div);
+    });
+
+    function submitQuiz() {
+      let score = 0;
+
+      selected.forEach((q, i) => {
+        const inputs = document.querySelectorAll(`input[name="q${i}"]`);
+        const checked = document.querySelector(`input[name="q${i}"]:checked`);
+        const checkedVal = checked ? parseInt(checked.value) : -1;
+
+        // Reset màu sắc cũ
+        inputs.forEach((input) => {
+             input.parentElement.classList.remove("correct", "wrong");
+        });
+
+        // 3. Logic tìm đáp án đúng:
+        // Dữ liệu lưu đáp án đúng là chuỗi text trong mảng 'correctAnswers', ví dụ ["a. ..."]
+        // Ta phải tìm xem chuỗi text đó ứng với index nào trong mảng 'options'
+        let correctIndex = -1;
+        
+        // Duyệt qua các options để tìm index của đáp án đúng
+        q.options.forEach((opt, idx) => {
+            // Kiểm tra xem option này có nằm trong danh sách đáp án đúng không
+            if (q.correctAnswers.includes(opt)) {
+                correctIndex = idx;
+            }
+        });
+
+        if (checkedVal === correctIndex) {
+            // Người dùng chọn đúng
+            score++;
+            checked.parentElement.classList.add("correct");
+        } else {
+            // Người dùng chọn sai hoặc chưa chọn
+            if (checked) {
+                checked.parentElement.classList.add("wrong");
+            }
+            
+            // Hiển thị đáp án đúng
+            if (correctIndex !== -1) {
+                const correctLabel = document.getElementById(`q${i}_opt${correctIndex}`);
+                if (correctLabel) {
+                    correctLabel.classList.add("correct"); 
+                }
+            }
+        }
+      });
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerText = `Kết quả: ${score}/20 câu đúng. `;
+      
+      if (score === 20) resultDiv.innerText += "Biển học vô biên - Tuyệt đối!";
+      else if (score >= 15) resultDiv.innerText += "Kiên trì làm bến - Rất tốt!";
+      else resultDiv.innerText += "Mây xanh không lối, lấy chí cả dựng lên - Cố gắng hơn!";
+      
+      resultDiv.scrollIntoView({ behavior: "smooth" });
+    }
+}
+</script>
+
+</body>
+</html>

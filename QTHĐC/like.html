@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Cyber-Symphony 2026: Eternal Loop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Orbitron:wght@500;900&family=Cinzel:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000; /* Nền tảng của vũ trụ */
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            cursor: none; /* Ẩn con trỏ chuột để tăng tính điện ảnh */
+        }
+
+        /* --- UI LAYER: Typography System --- */
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, transparent 0%, #000000 120%); /* Vignette effect */
+        }
+
+        .couplet {
+            font-family: 'Dancing Script', cursive;
+            color: #d4af37; /* Màu vàng kim cổ điển */
+            font-size: 2.5rem;
+            text-align: center;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.8), 0 0 20px rgba(255, 100, 0, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: floatUp 3s ease-out forwards;
+        }
+
+        .left-couplet { animation-delay: 0.5s; border-left: 3px solid rgba(212, 175, 55, 0.3); padding-left: 20px; }
+        .right-couplet { animation-delay: 1.5s; border-right: 3px solid rgba(212, 175, 55, 0.3); padding-right: 20px; }
+
+        .center-stage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 120;
+            mix-blend-mode: screen; /* Hòa trộn ánh sáng với pháo hoa phía sau */
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 8rem;
+            margin: 0;
+            letter-spacing: 15px;
+            font-weight: 900;
+            background: linear-gradient(to bottom, #ffffff 0%, #00f2ff 50%, #0011ff 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.8));
+            animation: breathe 4s infinite ease-in-out;
+        }
+
+        .author {
+            margin-top: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: #ffffff;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px #00aaff;
+            opacity: 0.9;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            font-family: 'Orbitron', sans-serif;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes floatUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes breathe {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.6)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 50px rgba(0, 242, 255, 1)); transform: scale(1.02); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ui-layer">
+        <div class="couplet left-couplet">
+            Biển học vô biên<br>
+            <span style="font-size: 1.5rem; color: #fff;">lấy</span><br>
+            Kiên trì làm bến
+        </div>
+        
+        <div class="center-stage">
+            <h1>2026</h1>
+            <div class="author">Thầy Hữu Giang</div>
+        </div>
+
+        <div class="couplet right-couplet">
+            Mây xanh không lối<br>
+            <span style="font-size: 1.5rem; color: #fff;">lấy</span><br>
+            Chí cả dựng lên
+        </div>
+    </div>
+
+    <div class="hint">/// SYSTEM AUTO-PILOT ENABLED /// CLICK TO INTERACT ///</div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        /**
+         * KIẾN TRÚC HỆ THỐNG: "ETERNAL LOOP ENGINE"
+         * 1. Canvas Context: Sử dụng 'lighter' blending để tạo hiệu ứng ánh sáng rực rỡ.
+         * 2. Orchestrator (Nhạc trưởng): Một AI đơn giản quyết định tần suất và loại pháo hoa.
+         * 3. Particle Physics: Hệ thống hạt có ma sát, trọng lực và độ trễ (drag).
+         */
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Tối ưu hóa độ phân giải cho màn hình Retina/High DPI
+        let width, height;
+        const resize = () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        };
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- CẤU HÌNH HỆ THỐNG ---
+        const CONFIG = {
+            gravity: 0.035,        // Trọng lực nhẹ để tạo cảm giác bay bổng
+            friction: 0.96,        // Ma sát không khí
+            trailLength: 0.12,     // Độ dài đuôi (càng nhỏ đuôi càng dài: 1 = không đuôi, 0.1 = rất dài)
+            hueSpeed: 2,           // Tốc độ đổi màu
+            baseParticleCount: 150 // Số lượng hạt cơ bản mỗi vụ nổ
+        };
+
+        // --- BẢNG MÀU CYBERPUNK ---
+        const PALETTES = [
+            { name: "Cyber", colors: ['#00f2ff', '#0099ff', '#ffffff'] }, // Xanh Neon
+            { name: "Plasma", colors: ['#ff0055', '#ff9900', '#ffff00'] }, // Lửa Plasma
+            { name: "Void",   colors: ['#aa00ff', '#ff00cc', '#ffffff'] }, // Tím Hư không
+            { name: "Gold",   colors: ['#ffd700', '#ffaa00', '#ffffff'] }  // Vàng Kim
+        ];
+
+        // --- UTILITIES (CÔNG CỤ TOÁN HỌC) ---
+        const random = (min, max) => Math.random() * (max - min) + min;
+        const randomColor = (palette) => palette[Math.floor(Math.random() * palette.length)];
+        
+        // Hàm tạo hình trái tim (Parametric Equation)
+        function getHeartPoint(t, scale) {
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            return { x: x * scale, y: y * scale };
+        }
+
+        // --- LỚP ĐỐI TƯỢNG (CLASSES) ---
+
+        class Particle {
+            constructor(x, y, color, velocity, isSparkle = false) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.vx = velocity.x;
+                this.vy = velocity.y;
+                this.alpha = 1;
+                this.friction = CONFIG.friction * random(0.98, 1.02); // Biến thiên ma sát tạo chiều sâu
+                this.gravity = CONFIG.gravity * random(0.8, 1.2);
+                this.decay = random(0.005, 0.015);
+                this.isSparkle = isSparkle; // Hạt lấp lánh phụ
+                this.flicker = Math.random() * Math.PI * 2; // Góc nhấp nháy
+            }
+
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+                
+                if (this.isSparkle) {
+                    this.flicker += 0.5;
+                    this.alpha -= 0.01; // Sparkle tan nhanh hơn
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                
+                // Hiệu ứng lấp lánh (Sparkle Effect)
+                if (this.isSparkle) {
+                    const scale = Math.sin(this.flicker) * 0.5 + 0.5;
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, scale * 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Vẽ hạt chính với glow
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 10; 
+                    ctx.shadowColor = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        class Firework {
+            constructor(startX, startY, targetX, targetY, paletteName = null) {
+                this.x = startX;
+                this.y = startY;
+                this.startX = startX;
+                this.startY = startY;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                
+                // Tính toán khoảng cách và góc bắn
+                const distance = Math.sqrt(Math.pow(targetX - startX, 2) + Math.pow(targetY - startY, 2));
+                const angle = Math.atan2(targetY - startY, targetX - startX);
+                
+                // Tốc độ dựa trên khoảng cách (hệ thống điều khiển lực đẩy)
+                const speed = distance / 40; 
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                
+                this.palette = paletteName ? PALETTES.find(p => p.name === paletteName) : PALETTES[Math.floor(Math.random() * PALETTES.length)];
+                this.color = this.palette.colors[0];
+                this.trail = [];
+                this.exploded = false;
+            }
+
+            update() {
+                // Lưu vị trí cũ để vẽ đuôi
+                this.trail.push({x: this.x, y: this.y});
+                if (this.trail.length > 5) this.trail.shift();
+
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Giả lập trọng lực tác động lên đầu đạn tên lửa
+                this.vy += 0.05; 
+
+                // Kiểm tra điều kiện nổ (khi đạt độ cao hoặc vận tốc y đổi chiều)
+                if (this.vy >= -0.5 && !this.exploded) {
+                    this.explode();
+                    return false; // Remove firework
+                }
+                return true; // Keep active
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.beginPath();
+                // Vẽ thân tên lửa
+                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+
+                // Vẽ đuôi lửa (Rocket Trail)
+                ctx.beginPath();
+                if (this.trail.length > 0) {
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    for (let point of this.trail) ctx.lineTo(point.x, point.y);
+                }
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            explode() {
+                // Flash trắng màn hình nhẹ khi nổ lớn (Subliminal impact)
+                // if (Math.random() > 0.8) document.body.style.background = '#111';
+                // setTimeout(() => document.body.style.background = '#000', 50);
+
+                const type = Math.random();
+                let count = CONFIG.baseParticleCount;
+
+                // --- LOGIC TẠO HÌNH (Geometry Generation) ---
+                if (type > 0.7) { 
+                    // Nổ hình Trái Tim (Heart)
+                    for (let i = 0; i < count; i++) {
+                        const t = (Math.PI * 2 * i) / count;
+                        const pos = getHeartPoint(t, random(0.5, 1.2));
+                        // Thêm nhiễu (noise) để trông tự nhiên hơn
+                        const vel = { x: pos.x * 0.15, y: pos.y * 0.15 };
+                        particles.push(new Particle(this.x, this.y, randomColor(this.palette.colors), vel));
+                    }
+                } else if (type > 0.4) {
+                    // Nổ kép (Double Ring)
+                    for (let i = 0; i < count; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 3 + 2;
+                        particles.push(new Particle(this.x, this.y, randomColor(this.palette.colors), {
+                            x: Math.cos(angle) * speed,
+                            y: Math.sin(angle) * speed
+                        }));
+                    }
+                    // Vòng trong chậm hơn
+                    for (let i = 0; i < count/2; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 1.5;
+                        particles.push(new Particle(this.x, this.y, '#fff', {
+                            x: Math.cos(angle) * speed,
+                            y: Math.sin(angle) * speed
+                        }, true)); // Sparkle particles
+                    }
+                } else {
+                    // Nổ cầu truyền thống với hiệu ứng rơi (Willow)
+                    for (let i = 0; i < count * 1.2; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 6;
+                        const p = new Particle(this.x, this.y, randomColor(this.palette.colors), {
+                            x: Math.cos(angle) * speed,
+                            y: Math.sin(angle) * speed
+                        });
+                        // Willow effect: Giảm ma sát, tăng trọng lực nhẹ
+                        p.friction = 0.95;
+                        particles.push(p);
+                    }
+                }
+            }
+        }
+
+        // --- BACKGROUND EFFECT (Cổng Thời Gian) ---
+        let timeGateRotation = 0;
+        function drawBackground() {
+            const cx = width / 2;
+            const cy = height / 2;
+            ctx.save();
+            ctx.translate(cx, cy);
+            
+            // Vòng 1
+            ctx.rotate(timeGateRotation);
+            ctx.strokeStyle = 'rgba(0, 242, 255, 0.05)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([20, 30]);
+            ctx.beginPath();
+            ctx.arc(0, 0, 200, 0, Math.PI*2);
+            ctx.stroke();
+
+            // Vòng 2 (Ngược chiều)
+            ctx.rotate(timeGateRotation * -2.5);
+            ctx.strokeStyle = 'rgba(255, 0, 85, 0.03)';
+            ctx.beginPath();
+            ctx.arc(0, 0, 350, 0, Math.PI*2);
+            ctx.stroke();
+
+            ctx.restore();
+            timeGateRotation += 0.001;
+        }
+
+        // --- MASTER LOOP ---
+        let fireworks = [];
+        let particles = [];
+        let tick = 0; // Đồng hồ hệ thống
+
+        function loop() {
+            requestAnimationFrame(loop);
+            tick++;
+
+            // 1. Tạo hiệu ứng mờ đuôi (Motion Blur Trail)
+            // Thay vì xóa sạch (clearRect), ta phủ một lớp đen bán trong suốt lên
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = `rgba(0, 0, 0, ${CONFIG.trailLength})`; 
+            ctx.fillRect(0, 0, width, height);
+
+            // 2. Chuyển sang chế độ hòa trộn ánh sáng (Additive Blending)
+            ctx.globalCompositeOperation = 'lighter';
+
+            // 3. Vẽ Background
+            drawBackground();
+
+            // 4. THE ORCHESTRATOR (Bộ điều phối tự động)
+            // Cứ mỗi khoảng thời gian, bắn pháo hoa tự động
+            if (tick % 30 === 0) { // Rhythm đều đặn
+                const startX = width * random(0.2, 0.8);
+                fireworks.push(new Firework(startX, height, startX + random(-100, 100), height * random(0.2, 0.5)));
+            }
+
+            if (tick % 150 === 0) { // Cao trào (Barrage)
+                for(let i=0; i<5; i++) {
+                    setTimeout(() => {
+                        const startX = width * random(0.1, 0.9);
+                        fireworks.push(new Firework(startX, height, width/2 + random(-200, 200), height * random(0.1, 0.4), "Gold"));
+                    }, i * 100);
+                }
+            }
+
+            // 5. Cập nhật & Vẽ Pháo hoa
+            fireworks = fireworks.filter(fw => fw.update());
+            fireworks.forEach(fw => fw.draw(ctx));
+
+            // 6. Cập nhật & Vẽ Hạt nổ
+            particles = particles.filter(p => p.alpha > 0);
+            particles.forEach(p => p.draw(ctx));
+        }
+
+        // --- INTERACTION (Tương tác người dùng) ---
+        canvas.addEventListener('mousedown', (e) => {
+            // Click để tạo nổ ngay lập tức
+            const count = 10; // Bắn chùm
+            for(let i=0; i<count; i++) {
+                const targetX = e.clientX + random(-50, 50);
+                const targetY = e.clientY + random(-50, 50);
+                fireworks.push(new Firework(width/2, height, targetX, targetY));
+            }
+        });
+
+        // Start the Engine
+        loop();
+
+    </script>
+</body>
+</html>

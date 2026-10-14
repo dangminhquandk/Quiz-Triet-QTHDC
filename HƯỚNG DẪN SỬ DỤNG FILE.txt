@@ -1,0 +1,11 @@
+HƯỚNG DẪN SỬ DỤNG FILE
+
+Bước 1: Tải folder về máy
+Bước 2: Nhấp chuột vào file "quiz_for_anyone.html" và làm bài
+
+Có thể: ôn đi ôn lại nhiều lần, xáo đề, xem điểm, kiểm tra lại bài vừa làm.
+Không thể: lưu lịch sử làm bài, kiểm tra các lần làm bài trước, chọn các câu hỏi muốn làm.
+
+Mọi người có thể kiểm tra các câu hỏi gốc tại file pdf bên cạnh.
+
+Thanh you everyone, DK!
